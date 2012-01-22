@@ -3,16 +3,12 @@ package main.scala
 case class Direction(name: String, aliasses: String*) {
   override def toString() = name
 }
-object North extends Direction("North", "N")
-object East extends Direction("East", "E")
-object South extends Direction("South", "S")
-object West extends Direction("West", "W")
 
 object Direction {
-  val North = Direction("North", "N")
-  val East  = Direction("East", "E")
-  val South = Direction("South", "S")
-  val West  = Direction("West", "W")
+  val North = Direction("North", "n", "north")
+  val East  = Direction("East", "e", "east")
+  val South = Direction("South", "s", "south")
+  val West  = Direction("West", "w", "west")
  
   private val directions = Seq(North, East, South, West)  
   def parseInput(input: String) = directions.find(direction => direction.name == input || direction.aliasses.contains(input))
@@ -50,6 +46,7 @@ object Rooms {
     Stream.empty
   }
 
+  import Direction._
   lazy val northRoom:Room = Room("North room", "This is the north room. It is very big. There is shit on the wall.", exits(Map(South -> mainRoom)))
   lazy val eastRoom: Room = Room("East Room", "This is the east room. It is full of puppies", exits(Map(West -> mainRoom)))
   lazy val southRoom:Room = Room("South room", "This is the south room. It is small. There are small people here that want to eat you. Om nom nom nom.", exits(Map(North -> mainRoom)))
@@ -79,7 +76,8 @@ object main {
     while(isRunning) {
       println()
       println(game.currentLocation)
-      val input = readLine
+      val input = readLine.toLowerCase
+      println("normalized input: " + input)
       // parse the input
       if (input == "exit") {
         isRunning = false
