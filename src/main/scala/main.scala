@@ -16,19 +16,23 @@ object Direction extends Enumeration {
 // use streams / lazily initialized values to create a network of rooms.
 // rather fancy really.
 // http://stackoverflow.com/questions/8962044/how-do-i-refer-to-a-variable-while-assigning-a-value-to-it-whilst-retaining-imm 
-case class Room(title: String, exitMap: Stream[Map[Direction.Direction, Room]]) {
+case class Room(title: String, description: String, exitMap: Stream[Map[Direction.Direction, Room]]) {
   def exits = exitMap(1) // skip the Streams empty head
   def hasExit(direction: Direction.Direction) = exits contains direction
   def exit(inDirection: Direction.Direction) = exits(inDirection)
 
   val outputFormat =
     """|{BOLD}{title}{/BOLD}
+       | 
+       | {description}
+       |
        | Exits:
        |  {exits}""".stripMargin
 
   override def toString() = {
     Formatter.parse(outputFormat, Map(
     "title" -> title,
+    "description" -> description,
     "exits" -> exits.map(exit => "  %s\n".format(exit._1)).mkString))
   }
 }
@@ -42,8 +46,8 @@ object Rooms {
   }
 
   import Direction._
-  lazy val first: Room = Room("North room", _exitMap(Map(South -> second)))
-  lazy val second: Room = Room("South room", _exitMap(Map(North -> first)))
+  lazy val first: Room = Room("North room", "This is the north room. It is very big. There is shit on the wall.", _exitMap(Map(South -> second)))
+  lazy val second: Room = Room("South room", "This is the south room. It is small. There are small people here that want to eat you. Om nom nom nom.", _exitMap(Map(North -> first)))
 }
             
 class Game(initialLocation: Room) {
@@ -60,8 +64,8 @@ class Game(initialLocation: Room) {
 
 object main {
   def main(args: Array[String]) {
-    import Direction._
 
+    println("Welcome to Fuck Yeah Awesome Pre-Beta 3, the Game that will Give you a Huge Boner.")
     var isRunning = true
     val game = new Game(Rooms.first)
 
