@@ -1,25 +1,30 @@
 package main.scala
 
-object Direction extends Enumeration {
-  type Direction = Value
-  val North = Value("North")
-  val East = Value("East")
-  val South = Value("South")
-  val West = Value("West")
-  val Unknown = Value("")
-  
-  def parseInput(input: String) = {
-    Direction.withName(input)
-  }
+case class Direction(name: String, aliasses: String*) {
+  override def toString() = name
+}
+object North extends Direction("North", "N")
+object East extends Direction("East", "E")
+object South extends Direction("South", "S")
+object West extends Direction("West", "W")
+
+object Direction {
+  val North = Direction("North", "N")
+  val East  = Direction("East", "E")
+  val South = Direction("South", "S")
+  val West  = Direction("West", "W")
+ 
+  private val directions = Seq(North, East, South, West)  
+  def parseInput(input: String) = directions.find(direction => direction.name == input || direction.aliasses.contains(input))
 }
 
 // use streams / lazily initialized values to create a network of rooms.
 // rather fancy really.
 // http://stackoverflow.com/questions/8962044/how-do-i-refer-to-a-variable-while-assigning-a-value-to-it-whilst-retaining-imm 
-case class Room(title: String, description: String, exitMap: Stream[Map[Direction.Direction, Room]]) {
+case class Room(title: String, description: String, exitMap: Stream[Map[Direction, Room]]) {
   def exits = exitMap(1) // skip the Streams empty head
-  def hasExit(direction: Direction.Direction) = exits contains direction
-  def exit(inDirection: Direction.Direction) = exits(inDirection)
+  def hasExit(direction: Direction) = exits contains direction
+  def exit(inDirection: Direction) = exits(inDirection)
 
   val outputFormat =
     """|{BOLD}{title}{/BOLD}
@@ -39,13 +44,12 @@ case class Room(title: String, description: String, exitMap: Stream[Map[Directio
 
 // lists all the rooms in this 'level'.
 object Rooms {
-  def exits(mappedItems: => Map[Direction.Direction, Room]) = {
-    Map[Direction.Direction, Room]() #::
+  def exits(mappedItems: => Map[Direction, Room]) = {
+    Map[Direction, Room]() #::
     mappedItems #::
     Stream.empty
   }
 
-  import Direction._
   lazy val northRoom:Room = Room("North room", "This is the north room. It is very big. There is shit on the wall.", exits(Map(South -> mainRoom)))
   lazy val eastRoom: Room = Room("East Room", "This is the east room. It is full of puppies", exits(Map(West -> mainRoom)))
   lazy val southRoom:Room = Room("South room", "This is the south room. It is small. There are small people here that want to eat you. Om nom nom nom.", exits(Map(North -> mainRoom)))
@@ -56,7 +60,7 @@ object Rooms {
 class Game(initialLocation: Room) {
    var currentLocation = initialLocation
 
-   def go(direction: Direction.Direction) {
+   def go(direction:Direction) {
     if (currentLocation.hasExit(direction)) {
       currentLocation = currentLocation.exit(direction)
     }
@@ -81,7 +85,8 @@ object main {
         isRunning = false
       } else {
         val direction = Direction.parseInput(input)
-        game.go(direction)
+        if (direction.isDefined) game.go(direction.get)
+        else println("WTF u going?")
       }
     }
     println("bai")
