@@ -2,15 +2,6 @@ package main.scala
 
 import scala.annotation.tailrec
 
-object Style {
-  private val CSI = "\033["
-  val ENDC = CSI + "0m"
-  def addStyle(content: String, style: String = Style.NONE) = "%s %s".format(style, content)
-
-  val NONE = ""
-  val BOLD = CSI + "1m"
-}
-
 object Formatter {
   val CSI = "\033["
   val ENDC = CSI + "0m"
@@ -19,7 +10,9 @@ object Formatter {
   // ex: {BOLD}{stuff}{/BOLD} outputs {stuff} as BOLD.
   val predefStyles = Map(
     "BOLD" -> (CSI+"1m"),
-    "/BOLD" -> ENDC
+    "/BOLD" -> ENDC,
+    "BROWN" -> (CSI + "0;33m"),
+    "/BROWN" -> ENDC
   )
   /**
    * Replace templates of the form {key} in the input String with values from the Map.
@@ -61,8 +54,10 @@ object Formatter {
      loop(text)
   }
   
-  def parse(input: String, params: Map[String, String]) = {
-    val actualParams = predefStyles ++ params 
+  def parse(input: String, params: Map[String, String]) : String = {
+    // Allow parameters to have their own formatting.
+    val parsedParams = params.map(kv => (kv._1, replaceTemplates(kv._2, predefStyles)))
+    val actualParams = predefStyles ++ parsedParams 
     replaceTemplates(input, actualParams)
   }
 }

@@ -47,11 +47,16 @@ object Rooms {
   }
 
   import Direction._
-  lazy val northRoom:Room = Room("North room", "This is the north room. It is very big. There is shit on the wall.", exits(Map(South -> mainRoom)))
+  lazy val northRoom:Room = Room("North room", "This is the north room. It is very big. There is {BROWN}shit{/BROWN} on the wall.", exits(Map(South -> mainRoom)))
   lazy val eastRoom: Room = Room("East Room", "This is the east room. It is full of puppies", exits(Map(West -> mainRoom)))
   lazy val southRoom:Room = Room("South room", "This is the south room. It is small. There are small people here that want to eat you. Om nom nom nom.", exits(Map(North -> mainRoom)))
   lazy val westRoom: Room = Room("West room", "This is the west room. Cocks cocks cocks cocks cocks cocks", exits(Map(East -> mainRoom)))
-  lazy val mainRoom: Room = Room("Main room", "This is the main room. There are rooms going in all direction from here.", exits(Map(North -> northRoom, East -> eastRoom, South -> southRoom, West -> westRoom)))
+
+  lazy val mainRoom: Room = Room("Main room", "This is the main room. There are {BOLD}rooms{/BOLD} going in all direction from here.", exits(Map(
+    North -> northRoom,
+    East  -> eastRoom,
+    South -> southRoom,
+    West  -> westRoom)))
 }
             
 class Game(initialLocation: Room) {
