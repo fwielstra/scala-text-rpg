@@ -2,7 +2,10 @@ package main.scala
 
 object Direction extends Enumeration {
   type Direction = Value
-  val North, East, South, West = Value
+  val North = Value("North")
+  val East = Value("East")
+  val South = Value("South")
+  val West = Value("West")
 }
 
 object Style {
@@ -15,7 +18,12 @@ object Style {
 }
 
 case class Room(title: String, exits: Seq[(Direction.Direction, Room)] = Nil) {
-  override def toString() = Style.addStyle(title, Style.BOLD)
+  override def toString() = {
+    "%s\n  %s\n%s".format(
+      Style.addStyle(title, Style.BOLD),
+      Style.addStyle("Exits:", Style.BOLD),
+      exits.map(exit => "    %s\n".format(exit._1)).mkString)
+  }
 }
 
 class Game(initialLocation: Room) {
@@ -31,6 +39,5 @@ object main {
     val roomOne = Room("A room", Seq((North, Room("Another room"))))
     val game = new Game(roomOne)
     print(roomOne)
-    print(game)
   }
 }
