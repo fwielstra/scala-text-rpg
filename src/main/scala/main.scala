@@ -8,21 +8,16 @@ object Direction extends Enumeration {
   val West = Value("West")
 }
 
-object Style {
-  private val CSI = "\033["
-  val ENDC = CSI + "0m"
-  def addStyle(content: String, style: String = Style.NONE) = "%s %s".format(style, content)
-
-  val NONE = ""
-  val BOLD = CSI + "1m"
-}
-
 case class Room(title: String, exits: Seq[(Direction.Direction, Room)] = Nil) {
+  val outputFormat =
+    """|{BOLD}{title}{/BOLD}
+       | Exits:
+       |  {exits}""".stripMargin
+
   override def toString() = {
-    "%s\n  %s\n%s".format(
-      Style.addStyle(title, Style.BOLD),
-      Style.addStyle("Exits:", Style.BOLD),
-      exits.map(exit => "    %s\n".format(exit._1)).mkString)
+    Formatter.parse(outputFormat, Map(
+      "title" -> title,
+      "exits" -> exits.map(exit => "  %s\n".format(exit._1)).mkString))
   }
 }
 
