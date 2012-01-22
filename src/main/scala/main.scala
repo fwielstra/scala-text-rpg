@@ -5,16 +5,22 @@ object Direction extends Enumeration {
   val North, East, South, West = Value
 }
 
-case class Room(exits: Seq[(Direction.Direction, Room)] = Nil)
+object Style {
+  private val CSI = "\033["
+  val BOLD = CSI + "1m"
+}
+
+
+case class Room(title: String, exits: Seq[(Direction.Direction, Room)] = Nil) {
+  override def toString() = "%s %s".format(Style.BOLD, title)
+}
 
 object main {
   def main(args: Array[String]) {
     println("ohai")
     import Direction._
 
-
-    val roomOne = Room(Seq((North, Room())))
+    val roomOne = Room("A room", Seq((North, Room("Another room"))))
     println(roomOne)
   }
 }
-// vim: set ts=2 sw=2 et:
